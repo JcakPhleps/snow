@@ -134,6 +134,7 @@ export function createRider(scene, camera, color = '#7cf0c8') {
     s.grounded = false;
     s.spin = s.flip = s.roll = 0;
     s.grabbed = false; s.holding = false;
+    s.charging = false; s.charge = 0;     // don't carry a half-charge into the air
     s.maxAir = 0;
     groundQuat(s.takeoffQuat);
   }
@@ -143,7 +144,7 @@ export function createRider(scene, camera, color = '#7cf0c8') {
     const flips = Math.round(Math.abs(s.flip) / (Math.PI * 2));
     const rolls = Math.round(Math.abs(s.roll) / (Math.PI * 2));
     const spinDeg = Math.round(Math.abs(s.spin) / Math.PI) * 180;
-    if (flips) parts.push((s.flip < 0 ? 'Front' : 'Back') + 'flip' + (flips > 1 ? ' x' + flips : ''));
+    if (flips) parts.push((s.flip > 0 ? 'Front' : 'Back') + 'flip' + (flips > 1 ? ' x' + flips : ''));
     if (rolls) parts.push((rolls > 1 ? rolls + 'x ' : '') + 'Cork');
     if (spinDeg >= 180) parts.push(spinDeg + '');
     if (s.grabbed) parts.push('Grab');
@@ -279,8 +280,8 @@ export function createRider(scene, camera, color = '#7cf0c8') {
       if (s.pos.y - gyAir > s.maxAir) s.maxAir = s.pos.y - gyAir;  // for big-air leniency
       if (K(['a', 'arrowleft'])) s.spin += AIR_SPIN * dt;
       if (K(['d', 'arrowright'])) s.spin -= AIR_SPIN * dt;
-      if (K(['w', 'arrowup'])) s.flip -= AIR_FLIP * dt;
-      if (K(['s', 'arrowdown'])) s.flip += AIR_FLIP * dt;
+      if (K(['w', 'arrowup'])) s.flip += AIR_FLIP * dt;      // W = frontflip
+      if (K(['s', 'arrowdown'])) s.flip -= AIR_FLIP * dt;    // S = backflip
       if (K(['q'])) s.roll -= AIR_ROLL * dt;
       if (K(['e'])) s.roll += AIR_ROLL * dt;
       s.holding = s.keys[' '] === true;
@@ -314,8 +315,16 @@ export function createRider(scene, camera, color = '#7cf0c8') {
     s.camYaw += d * Math.min(1, dt * 3);
     const back = 8 + speed * 0.1, upH = 3.2 + speed * 0.03;
     camTarget.set(s.pos.x - Math.sin(s.camYaw) * back, s.pos.y + upH, s.pos.z - Math.cos(s.camYaw) * back);
+    // On steep runs the slope behind you rises fast — keep the camera above the
+    // snow at its own spot so it looks DOWN the hill instead of into it.
+    camTarget.y = Math.max(camTarget.y, height(camTarget.x, camTarget.z) + 3);
     camera.position.lerp(camTarget, Math.min(1, dt * 5));
-    camera.lookAt(s.pos.x + Math.sin(s.camYaw) * 3, s.pos.y + 1, s.pos.z + Math.cos(s.camYaw) * 3);
+    // Aim at the snow ahead so on steep runs the camera tilts down to follow the
+    // hill (instead of staring out over the drop-off at the sky).
+    const aX = s.pos.x + Math.sin(s.camYaw) * 7;
+    const aZ = s.pos.z + Math.cos(s.camYaw) * 7;
+    const aY = Math.min(s.pos.y + 1, height(aX, aZ) + 1.6);
+    camera.lookAt(aX, aY, aZ);
     const targetFov = 60 + Math.min(24, speed * 0.65) + (K(['w', 'shift']) ? 6 : 0);
     s.camFov += (targetFov - s.camFov) * Math.min(1, dt * 3);
     if (Math.abs(camera.fov - s.camFov) > 0.1) { camera.fov = s.camFov; camera.updateProjectionMatrix(); }

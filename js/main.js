@@ -127,7 +127,10 @@ function applyLook(level) {
 
 function startLevel(id) {
   currentLevelId = id;
-  if (mountainRoot) scene.remove(mountainRoot);
+  if (mountainRoot) {
+    scene.remove(mountainRoot);
+    mountainRoot.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
+  }
   const built = buildMountain(scene, id);
   mountainRoot = built.root;
   levelMeta = built;
@@ -140,7 +143,7 @@ function startLevel(id) {
   $('finish').classList.add('hidden');
   $('hud').classList.remove('hidden');
   $('level-pill').textContent = built.level.name;
-  playGame();
+  playGame(true);   // fresh random track for each run
 }
 
 $('restart-btn').onclick = () => rider && rider.reset();

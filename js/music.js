@@ -45,13 +45,14 @@ function next() {
   load();
 }
 
-function play(tracks, tag) {
-  if (which === tag) { if (!muted && audio.paused) audio.play().catch(() => {}); return; }
+function play(tracks, tag, forceNew) {
+  if (which === tag && !forceNew) { if (!muted && audio.paused) audio.play().catch(() => {}); return; }
   which = tag; list = shuffle(tracks); idx = 0; load();
 }
 
-export function playMenu() { play(MENU, 'menu'); }
-export function playGame() { play(GAME, 'game'); }
+// forceNew = jump to a fresh random track even if this playlist is already on.
+export function playMenu(forceNew) { play(MENU, 'menu', forceNew); }
+export function playGame(forceNew) { play(GAME, 'game', forceNew); }
 export function setMuted(m) {
   muted = m; audio.muted = m;
   if (m) audio.pause(); else audio.play().catch(() => {});
