@@ -1,0 +1,56 @@
+{
+  "rules": {
+    "presence": {
+      ".read": true,
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "knocks": {
+      "$host": {
+        ".read": "auth != null && auth.uid === $host",
+        "$visitor": {
+          ".read": "auth != null && auth.uid === $visitor",
+          ".write": "auth != null && (auth.uid === $visitor || auth.uid === $host)"
+        }
+      }
+    },
+    "rooms": {
+      "$host": {
+        ".read": "auth != null",
+        "players": {
+          "$uid": {
+            ".write": "auth != null && (auth.uid === $uid || auth.uid === $host)"
+          }
+        },
+        "chat": {
+          ".write": "auth != null && auth.uid === $host",
+          "$msg": {
+            ".write": "auth != null"
+          }
+        },
+        "music": {
+          ".write": "auth != null"
+        },
+        "kicks": {
+          ".write": "auth != null && auth.uid === $host"
+        }
+      }
+    },
+    "snow": {
+      "riders": {
+        ".read": true,
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      },
+      "chat": {
+        ".read": true,
+        ".write": "auth != null",
+        "$msg": {
+          ".validate": "newData.hasChildren(['name','text'])"
+        }
+      }
+    }
+  }
+}

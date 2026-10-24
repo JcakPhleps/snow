@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>SNOW</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2305121a'/><circle cx='8' cy='8' r='4' fill='%23eef3ff'/><circle cx='8' cy='8' r='2' fill='%234fd6e6'/></svg>" />
+  <meta name="theme-color" content="#05121a" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+      "firebase/app": "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js",
+      "firebase/database": "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- Title: pick a name + board color -->
+  <div id="title" class="overlay">
+    <div class="title-card">
+      <h1>SNOW</h1>
+      <p class="tag">one mountain. all your friends. send it.</p>
+      <div id="login-box">
+        <input id="name-input" class="auth-input" placeholder="your rider name" maxlength="16" autocomplete="off" />
+        <div class="field-label">Board color</div>
+        <div id="color-swatches" class="color-swatches big"></div>
+        <button id="play-btn" class="auth-provider">DROP IN</button>
+        <p id="title-error" class="auth-error"></p>
+      </div>
+      <p class="hint">A / D carve · S brake · hold SPACE to charge a jump · in air: A/D spin · W/S flip · Q/E cork · hold SPACE grab</p>
+    </div>
+  </div>
+
+  <!-- Level select -->
+  <div id="level-select" class="overlay hidden">
+    <div class="ls-card">
+      <div class="ls-head">
+        <h2>PICK YOUR RUN</h2>
+        <button id="mute-ls" class="hud-btn ghost" title="music">🎵</button>
+      </div>
+      <div id="level-grid" class="level-grid"></div>
+    </div>
+  </div>
+
+  <!-- In-game HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-left">
+      <div id="score-big">0</div>
+      <div id="score-label">SCORE</div>
+      <div id="combo" class="hidden"></div>
+    </div>
+    <div class="hud-right">
+      <div id="speed"><b>0</b><span>MPH</span></div>
+      <div id="level-pill" class="pill"></div>
+      <div id="riders-pill" class="pill">1 on the hill</div>
+      <div class="hud-btns">
+        <button id="mute-btn" class="hud-btn ghost" title="music">🎵</button>
+        <button id="restart-btn" class="hud-btn ghost">⟲ TOP</button>
+        <button id="levels-btn" class="hud-btn ghost">RUNS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- charge-jump power meter -->
+  <div id="charge" class="hidden"><div id="charge-fill"></div></div>
+
+  <!-- live trick text + toast -->
+  <div id="trick" class="hidden"></div>
+  <div id="toast" class="hidden"></div>
+
+  <!-- finish card -->
+  <div id="finish" class="overlay hidden">
+    <div class="auth-card">
+      <h2>RUN COMPLETE</h2>
+      <div id="finish-score" class="finish-score">0</div>
+      <p class="auth-sub">nice line. drop in again and beat it.</p>
+      <button id="finish-again" class="auth-provider">RIDE AGAIN</button>
+      <button id="finish-levels" class="auth-provider ghost">PICK ANOTHER RUN</button>
+    </div>
+  </div>
+
+  <!-- mountain chat -->
+  <div id="chat">
+    <div id="chat-log" class="chat-log"></div>
+    <input id="chat-input" class="chat-input" placeholder="say something… (Enter)" maxlength="200" />
+  </div>
+
+  <script type="module" src="js/main.js?v=3"></script>
+</body>
+</html>
