@@ -182,6 +182,7 @@ function esc(s) { return (s || '').replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>':
 
 // ---- HUD ----
 function updateHud(h) {
+  window.__hud = h;   // read by tests; harmless
   $('score-big').textContent = h.score.toLocaleString();
   $('speed').innerHTML = `<b>${h.speed}</b><span>MPH</span>`;
   const comboEl = $('combo');

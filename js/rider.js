@@ -155,15 +155,16 @@ export function createRider(scene, camera, color = '#7cf0c8') {
     const n = normal(s.pos.x, s.pos.z);
     const attempted = Math.abs(s.spin) > 0.4 || Math.abs(s.flip) > 0.4 || Math.abs(s.roll) > 0.4;
     let clean = true;
-    // Big air is never punished — stomp anything if you went high enough.
-    if (attempted && s.maxAir < 8) {
+    // Any real air is safe — if you got off the ground to any decent height you
+    // stomp it no matter how messy. Only tiny hops done sideways can still bail.
+    if (attempted && s.maxAir < 3) {
       _fwd.set(0, 0, 1).applyQuaternion(group.quaternion).setY(0);
       const bup = _v.set(0, 1, 0).applyQuaternion(group.quaternion);
       const upDot = bup.dot(n);
       const travel = _right.set(s.vel.x, 0, s.vel.z);
       const fwdDot = travel.lengthSq() > 0.1 && _fwd.lengthSq() > 0.01
         ? Math.abs(_fwd.normalize().dot(travel.normalize())) : 1;
-      clean = upDot > 0.5 && fwdDot > 0.45;
+      clean = upDot > 0.4 && fwdDot > 0.38;
     }
     if (clean) {
       const flips = Math.round(Math.abs(s.flip) / (Math.PI * 2));
@@ -344,7 +345,7 @@ export function createRider(scene, camera, color = '#7cf0c8') {
       score: s.score, best: s.best, combo: s.combo,
       trick: s.grounded ? '' : s.trickText, toast: s.toast,
       airborne: !s.grounded, bailing: s.bailing > 0, finished: s.finished,
-      charge: s.charging ? s.charge : 0,
+      charge: s.charging ? s.charge : 0, maxAir: +s.maxAir.toFixed(1),
     }),
     getNetState: () => ({
       x: +s.pos.x.toFixed(2), y: +s.pos.y.toFixed(2), z: +s.pos.z.toFixed(2),
